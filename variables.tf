@@ -28,3 +28,21 @@ variable "public_subnets" {
     "public_subnet_3" = 2
   }
 }
+
+variable "variable_sub_cidr" {
+  description = "CIDR Block for the Variables Subnet"
+  type        = string
+  default     = "10.0.202.0/24"
+}
+
+variable "variable_sub_az" {
+  description = "Availability Zone used Variables subnet"
+  type        = string
+  default     = "eu-north-1a"
+}
+
+variable "variable_sub_auto_ip" {
+  description = "Set Automatic IP Assignment for Variables Subnet"
+  type        = bool
+  default     = true
+}

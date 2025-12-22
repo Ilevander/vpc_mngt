@@ -197,3 +197,15 @@ resource "aws_security_group" "my-new-security-group" {
     Purpose = "My resource Blocks"
   }
 }
+
+resource "aws_subnet" "variables-subnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.variable_sub_cidr
+  availability_zone       = var.variable_sub_az
+  map_public_ip_on_launch = var.variable_sub_auto_ip
+
+  tags = {
+    Name      = "sub-variables-${var.variable_sub_az}"
+    Terraform = "true"
+  }
+}
