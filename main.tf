@@ -161,3 +161,39 @@ resource "aws_instance" "web" {
     "Terraform" = "true"
   }
 }
+
+#Create the S3 Bucket
+resource "aws_s3_bucket" "my-new-s3-bucket" {
+  bucket = "my-new-tf-test-bucket-ilyass003"
+
+  tags = {
+    Name    = "My S3 Bucket"
+    Purpose = "Resource block of S3 Bucket aws"
+  }
+}
+
+#Create the S3 bucket ACL
+resource "aws_s3_bucket_acl" "my_new_bucket_acl" {
+  bucket = aws_s3_bucket.my-new-s3-bucket.id
+  acl    = "private"
+}
+
+#Create a new security Group
+resource "aws_security_group" "my-new-security-group" {
+  name        = "web_servre_inbouned"
+  description = "Allow inbouned traffic on tcp/443"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    description = "Allow 443 from the Internet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "web_server_inbound"
+    Purpose = "My resource Blocks"
+  }
+}
