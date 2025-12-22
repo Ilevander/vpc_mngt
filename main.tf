@@ -21,7 +21,7 @@ resource "aws_subnet" "private_subnets" {
   for_each          = var.private_subnets
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = cidrsubnet(var.vpc_cidr, 8, each.value)
-  availability_zone = tolist(data.aws_availability_zones.available.names)[each.value - 1]
+  availability_zone = data.aws_availability_zones.available.names[each.value]
 
   tags = {
     Name      = each.key
@@ -35,9 +35,7 @@ resource "aws_subnet" "public_subnets" {
 
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = cidrsubnet(var.vpc_cidr, 8, each.value + 100)
-  availability_zone       = data.aws_availability_zones.available.names[
-    (each.value - 1) % length(data.aws_availability_zones.available.names)
-  ]
+  availability_zone       = data.aws_availability_zones.available.names[each.value]
   map_public_ip_on_launch = true
 
   tags = {
@@ -118,3 +116,48 @@ resource "aws_internet_gateway" "internet_gateway" {
 #     Name = "demo_nat_gateway"
 #   }
 # }
+
+#Creating the security Group
+resource "aws_security_group" "web" {
+  name        = "web-sg"
+  description = "Allow SSH and HTTP"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "web-sg"
+  }
+}
+
+#Create the aws instance
+resource "aws_instance" "web" {
+  ami                    = "ami-0fd67c67853eafcef"
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
+  vpc_security_group_ids = [aws_security_group.web.id]
+
+  tags = {
+    "Name"      = "demo-ec2"
+    "Terraform" = "true"
+  }
+}
