@@ -155,10 +155,12 @@ resource "aws_instance" "web" {
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
   vpc_security_group_ids = [aws_security_group.web.id]
-
+  
   tags = {
-    "Name"      = "demo-ec2"
-    "Terraform" = "true"
+    Name      = local.server_name
+    Owner     = local.team
+    App       = local.application
+    Terraform = "true"
   }
 }
 
@@ -208,4 +210,10 @@ resource "aws_subnet" "variables-subnet" {
     Name      = "sub-variables-${var.variable_sub_az}"
     Terraform = "true"
   }
+}
+
+locals {
+  team        = "api_mgmt_dev"
+  application = "corp_api"
+  server_name = "ec2-${var.environment}-api-${var.variable_sub_az}"
 }
