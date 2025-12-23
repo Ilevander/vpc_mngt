@@ -150,12 +150,12 @@ resource "aws_security_group" "web" {
 }
 
 #Create the aws instance
-resource "aws_instance" "web" {
+resource "aws_instance" "web_server" {
   ami                    = "ami-0fd67c67853eafcef"
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
   vpc_security_group_ids = [aws_security_group.web.id]
-  
+
   tags = {
     Name      = local.server_name
     Owner     = local.team
